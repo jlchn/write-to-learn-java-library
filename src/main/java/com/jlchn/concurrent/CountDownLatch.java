@@ -11,6 +11,9 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
  * countdown the state when signal
  *
  * no need to update state in the await
+ *
+ * when the state is counted down to 0, the call to both await and countdown will return immediately, that is,
+ * the countdownlatch is a one time latch that cannot be reused.
  */
 public class CountDownLatch {
 
