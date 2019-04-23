@@ -20,6 +20,11 @@ public class CountDownLatch {
             setState(count);
         }
 
+        /**
+         * add to AQS blocking queue if the state is 0 (haven't countdown to 0 yet)
+         * @param arg
+         * @return
+         */
         @Override
         protected int tryAcquireShared(int arg) {
 
@@ -34,6 +39,11 @@ public class CountDownLatch {
             return -1;
         }
 
+        /**
+         * countdown the state by 1 every time it is called.
+         * @param arg
+         * @return
+         */
         @Override
         protected boolean tryReleaseShared(int arg) {
 
@@ -45,7 +55,7 @@ public class CountDownLatch {
                 int current = this.getState();
 
                 if (current == 0){
-                    return false;
+                    return false;// indicate no need to call doReleaseAcquired in AbstractQueuedSynchronizer.releaseShared
                 }
 
                 if (!compareAndSetState(current, current -1)){
