@@ -8,13 +8,16 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
-/**
- * @author jiangli
- * @date 23/04/2019
- */
+
+
 public class Mutex implements Lock, Serializable {
 
 
+    private final Sync sync = new Sync();
+
+    /**
+     * https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/locks/AbstractQueuedSynchronizer.html
+     */
 
     private static class Sync extends AbstractQueuedSynchronizer{
 
@@ -43,6 +46,10 @@ public class Mutex implements Lock, Serializable {
             return true;
         }
 
+        Condition newCondition(){
+            return new ConditionObject();
+        }
+
         // Deserialize properly
         private void readObject(ObjectInputStream s)
                 throws IOException, ClassNotFoundException {
@@ -55,31 +62,31 @@ public class Mutex implements Lock, Serializable {
 
     @Override
     public void lock() {
-
+        sync.acquire(1);
     }
 
     @Override
     public void lockInterruptibly() throws InterruptedException {
-
+        sync.acquireInterruptibly(1);
     }
 
     @Override
     public boolean tryLock() {
-        return false;
+        return sync.tryAcquire(1);
     }
 
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-        return false;
+        return sync.tryAcquireNanos(1, unit.toNanos(time));
     }
 
     @Override
     public void unlock() {
-
+        sync.tryRelease(1);
     }
 
     @Override
     public Condition newCondition() {
-        return null;
+        return sync.newCondition();
     }
 }
